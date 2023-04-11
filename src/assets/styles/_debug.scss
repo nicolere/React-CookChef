@@ -1,3 +1,5 @@
+@use './mixins' as mixin;
+
 .b1 {
     background-color: red;
     border: 1px solid red;
@@ -16,4 +18,26 @@
 .b4 {
     background-color: purple;
     border: 1px solid purple;
+}
+
+.br {
+    @include mixin.xs {
+        border: solid 2px blue;
+    }
+
+    @include mixin.sm {
+        border: solid 2px red;
+    }
+
+    @include mixin.md {
+        border: solid 2px green;
+    }
+
+    @include mixin.lg {
+        border: solid 2px orange;
+    }
+
+    @include mixin.xl {
+        border: solid 2px purple;
+    }
 }

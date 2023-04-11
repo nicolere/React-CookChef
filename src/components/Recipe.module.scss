@@ -31,4 +31,26 @@
     border: 1px solid var(--grey-2);
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
+
+    i {
+        font-size: 20px;
+        &:hover {
+            animation: bounce 0.9s linear;
+        }
+    }
+}
+
+@keyframes bounce {
+    20%, 50%, 80%, to {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    70% {
+        transform: translateY(-7px);
+    }
+    90% {
+        transform: translateY(-3px);
+    }
 }

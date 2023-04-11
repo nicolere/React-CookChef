@@ -5,7 +5,7 @@ import styles from "./App.module.scss";
 
 function App() {
   return (
-    <div className={`d-flex flex-column ${styles.appContainer}`}>
+    <div className={`d-flex flex-column justify-content-center ${styles.appContainer}`}>
       <Header />
       <Content />
       <Footer />
