@@ -2,10 +2,28 @@ import { ApiContext } from '../../../../context/ApiContext';
 import { useContext } from 'react';
 import styles from './Recipe.module.scss';
 
-function Recipe({ recipe: { _id, liked, title, image }, toggleLikeRecipe }) {
+function Recipe({
+  recipe: { _id, liked, title, image },
+  toggleLikeRecipe,
+  deleteRecipe,
+}) {
   const BASE_URL_API = useContext(ApiContext);
 
-  async function handleClick() {
+  async function handleClickDelete(e) {
+    e.stopPropagation();
+    try {
+      const response = await fetch(`${BASE_URL_API}/${_id}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        deleteRecipe(_id);
+      }
+    } catch (e) {
+      throw new Error("Erreur lors du delete d'une recette");
+    }
+  }
+
+  async function handleClickLike() {
     try {
       const response = await fetch(`${BASE_URL_API}/${_id}`, {
         method: 'PATCH',
@@ -27,6 +45,7 @@ function Recipe({ recipe: { _id, liked, title, image }, toggleLikeRecipe }) {
 
   return (
     <div className={styles.recipe}>
+      <i onClick={handleClickDelete} className="far fa-times-circle"></i>
       <div className={styles.imageContainer}>
         <img src={image} alt="recipe" />
       </div>
@@ -35,7 +54,7 @@ function Recipe({ recipe: { _id, liked, title, image }, toggleLikeRecipe }) {
       >
         <h3 className="mb-10">{title}</h3>
         <i
-          onClick={handleClick}
+          onClick={handleClickLike}
           className={`fas fa-heart ${liked ? 'text-primary' : ''}`}
         ></i>
       </div>
