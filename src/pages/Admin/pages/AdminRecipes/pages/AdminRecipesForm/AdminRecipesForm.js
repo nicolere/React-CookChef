@@ -1,15 +1,17 @@
-import styles from './RecipeForm.module.scss';
+import styles from './AdminRecipesForm.module.scss';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useContext } from 'react';
-import { ApiContext } from '../../../../context/ApiContext';
+import { createRecipe$, updateRecipe$ } from '../../../../../../apis/recipe';
+import { useLoaderData, useNavigate } from 'react-router-dom';
 
-function RecipeForm() {
-  const BASE_URL_API = useContext(ApiContext);
-  const defaultvalues = {
-    title: '',
-    image: '',
+function AdminRecipesForm() {
+  const recipe = useLoaderData();
+  const navigate = useNavigate();
+
+  const defaultValues = {
+    title: recipe ? recipe.title : '',
+    image: recipe ? recipe.image : '',
   };
 
   const recipeSchema = yup.object({
@@ -29,40 +31,43 @@ function RecipeForm() {
     register,
     handleSubmit,
     reset,
+    setError,
     clearErrors,
-  } = useForm({ defaultvalues, resolver: yupResolver(recipeSchema) });
+  } = useForm({ defaultValues, resolver: yupResolver(recipeSchema) });
 
   async function submit(values) {
     try {
       clearErrors();
-      const response = await fetch(BASE_URL_API, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-
-      if (response.ok) {
-        reset(defaultvalues);
+      if (recipe) {
+        await updateRecipe$({
+          ...values,
+          _id: recipe._id,
+        });
+        navigate('/admin/recipes/list');
+      } else {
+        await createRecipe$(values);
+        reset(defaultValues);
       }
     } catch (e) {
-      throw new Error('Erreur durant la création de recette');
+      setError('generic', {
+        type: 'generic',
+        message: 'Erreur durant la création de recette',
+      });
     }
   }
 
   return (
     <form
       onSubmit={handleSubmit(submit)}
-      className={`d-flex flex-column align-items-center card p-20 ${styles.form}`}
+      className={`d-flex flex-column card p-20 ${styles.form}`}
     >
-      <h2>Ajouter une recette</h2>
-      <div className="d-flex flex-column mb-20">
+      <h2 className="mb-10">Ajouter une recette</h2>
+      <div className="d-flex flex-fill flex-column mb-20">
         <label>Titre de la recette</label>
         <input {...register('title')} type="text" />
         {errors.title && <p className="form-error">{errors.title.message}</p>}
       </div>
-      <div className="d-flex flex-column mb-20">
+      <div className="d-flex flex-fill flex-column mb-20">
         <label>Image pour la recette</label>
         <input {...register('image')} type="text" />
         {errors.image && <p className="form-error">{errors.image.message}</p>}
@@ -76,4 +81,4 @@ function RecipeForm() {
   );
 }
 
-export default RecipeForm;
+export default AdminRecipesForm;

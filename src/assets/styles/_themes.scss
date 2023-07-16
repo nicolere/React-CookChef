@@ -15,6 +15,12 @@
     border: 1px solid var(--primary);
 }
 
+.btn-danger{
+    background-color: var(--red-1);
+    color: white;
+    border: 1px solid var(--red-1);
+}
+
 .btn-reverse-primary {
     border: 2px solid var(--primary);
     background-color: white;

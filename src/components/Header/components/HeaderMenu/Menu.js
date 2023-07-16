@@ -1,9 +1,12 @@
+import { NavLink } from 'react-router-dom';
 import styles from './Menu.module.scss';
 
-function Menu({ setPage }) {
+function Menu() {
   return (
     <ul className={`${styles.MenuContainer} card p-10`}>
-      <li onClick={() => setPage('admin')}>Ajouter recette</li>
+      <li>
+        <NavLink to="/admin">Ajouter recette</NavLink>
+      </li>
       <li>Wishlist</li>
       <li>Connexion</li>
     </ul>

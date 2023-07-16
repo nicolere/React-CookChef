@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
+import { getRecipes$ } from '../apis/recipe';
 
-export function useFetchData(url, page) {
-  const [data, setData] = useState([]);
+export function useFetchRecipes(page) {
+  const [recipes, setRecipes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let cancel = false;
-    async function fetchData() {
+    async function fetchRecipes() {
       try {
         setIsLoading(true);
         const queryParam = new URLSearchParams();
@@ -15,12 +16,10 @@ export function useFetchData(url, page) {
           queryParam.append('skip', (page - 1) * 15);
           queryParam.append('sort', 'createdAt:-1');
         }
-        const response = await fetch(url + `?${queryParam}`);
-        if (response.ok && !cancel) {
-          const newData = await response.json();
-          setData((x) =>
-            Array.isArray(newData) ? [...x, ...newData] : [...x, newData]
-          );
+        const fetchedRecipes = await getRecipes$(queryParam);
+
+        if (!cancel) {
+          setRecipes((x) => [...x, ...fetchedRecipes]);
         }
       } catch (e) {
         throw new Error('Erreur de chargement de recettes');
@@ -30,9 +29,9 @@ export function useFetchData(url, page) {
         }
       }
     }
-    fetchData();
+    fetchRecipes();
     return () => (cancel = true);
-  }, [url, page]);
+  }, [page]);
 
-  return [[data, setData], isLoading];
+  return [[recipes, setRecipes], isLoading];
 }
