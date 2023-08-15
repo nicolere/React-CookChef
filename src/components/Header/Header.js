@@ -2,10 +2,14 @@ import styles from './Header.module.scss';
 import cookchef from '../../assets/images/cookchef.png';
 import { useState } from 'react';
 import Menu from './components/HeaderMenu/Menu';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
+import { useSetRecoilState } from 'recoil';
+import { wishlistDisplayState } from '../../state';
 
 function Header() {
   const [showMenu, setShowMenu] = useState(false);
+  const setWishlistDisplay = useSetRecoilState(wishlistDisplayState);
+  const location = useLocation();
 
   return (
     <header className={` ${styles.header} d-flex flex-row align-items-center`}>
@@ -21,11 +25,15 @@ function Header() {
             <span>Admin</span>
           </button>
         </NavLink>
-        <button className="mr-10 btn btn-reverse-primary">
-          <i className="fas fa-heart mr-5"></i>
-          <span>Wishlist</span>
-        </button>
-        <button className="btn btn-primary">Connexion</button>
+        {!location.pathname.includes('admin') && (
+          <button
+            onClick={() => setWishlistDisplay(true)}
+            className="mr-10 btn btn-reverse-primary"
+          >
+            <i className="fas fa-heart mr-5"></i>
+            <span>Wishlist</span>
+          </button>
+        )}
       </ul>
       <i
         onClick={() => setShowMenu(true)}
@@ -34,7 +42,7 @@ function Header() {
       {showMenu && (
         <>
           <div onClick={() => setShowMenu(false)} className="calc"></div>
-          <Menu />
+          <Menu setWishlistDisplay={setWishlistDisplay} />
         </>
       )}
     </header>

@@ -1,11 +1,14 @@
 import { NavLink } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
 import { deleteRecipe$ } from '../../../../../../apis/recipe';
 import Loader from '../../../../../../components/Loader/Loader';
 import { useFetchRecipes } from '../../../../../../hooks/useFetchRecipes';
+import { recipesState } from '../../../../../../state';
 import styles from './AdminRecipesList.module.scss';
 
 function AdminRecipesList() {
-  const [[recipes, setRecipes], isLoading] = useFetchRecipes();
+  const [isLoading] = useFetchRecipes();
+  const [recipes, setRecipes] = useRecoilState(recipesState);
 
   async function deleteRecipe(_id) {
     await deleteRecipe$(_id);

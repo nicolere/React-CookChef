@@ -5,11 +5,21 @@ import { useState } from 'react';
 import Search from './components/Search/Search';
 import { useFetchRecipes } from '../../hooks/useFetchRecipes';
 import { deleteRecipe$, updateRecipe$ } from '../../apis/recipe';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import {
+  selectFilteredRecipes,
+  recipesState,
+  wishlistDisplayState,
+} from '../../state';
+import Wishlist from './components/Wishlist/Wishlist';
 
 function Homepage() {
   const [filter, setFilter] = useState('');
   const [page, setPage] = useState(1);
-  const [[recipes, setRecipes], isLoading] = useFetchRecipes(page);
+  const [isLoading] = useFetchRecipes(page);
+  const recipes = useRecoilValue(selectFilteredRecipes(filter));
+  const setRecipes = useSetRecoilState(recipesState);
+  const showWishlist = useRecoilValue(wishlistDisplayState);
 
   async function updateRecipe(updatedRecipe) {
     const savedRecipes = await updateRecipe$(updatedRecipe);
@@ -24,24 +34,23 @@ function Homepage() {
   }
 
   return (
-    <div className="flex-fill container d-flex flex-column p-20">
-      <h1 className="my-30">
-        Découvrez nos nouvelles recettes ({recipes.length})
-      </h1>
-      <div
-        className={`card d-flex flex-fill flex-column p-20 ${styles.contentCards}`}
-      >
-        <Search setFilter={setFilter} />
-        {isLoading && !recipes.length ? (
-          <div className="d-flex flex-fill align-items-center">
-            <Loader />
-          </div>
-        ) : (
-          <>
-            <div className={styles.grid}>
-              {recipes
-                .filter((r) => r.title.toLocaleLowerCase().startsWith(filter))
-                .map((recipe) => (
+    <>
+      <div className="flex-fill container d-flex flex-column p-20">
+        <h1 className="my-30">
+          Découvrez nos nouvelles recettes ({recipes.length})
+        </h1>
+        <div
+          className={`card d-flex flex-fill flex-column p-20 ${styles.contentCards}`}
+        >
+          <Search setFilter={setFilter} />
+          {isLoading && !recipes.length ? (
+            <div className="d-flex flex-fill align-items-center">
+              <Loader />
+            </div>
+          ) : (
+            <>
+              <div className={styles.grid}>
+                {recipes.map((recipe) => (
                   <Recipe
                     key={recipe._id}
                     recipe={recipe}
@@ -49,19 +58,21 @@ function Homepage() {
                     updateRecipe={updateRecipe}
                   />
                 ))}
-            </div>
-            <div className="d-flex flex-row justify-content-center align-items-center m-20">
-              <button
-                onClick={() => setPage(page + 1)}
-                className="btn btn-primary"
-              >
-                Charger plus de recettes
-              </button>
-            </div>
-          </>
-        )}
+              </div>
+              <div className="d-flex flex-row justify-content-center align-items-center m-20">
+                <button
+                  onClick={() => setPage(page + 1)}
+                  className="btn btn-primary"
+                >
+                  Charger plus de recettes
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+      {showWishlist && <Wishlist />}
+    </>
   );
 }
 
